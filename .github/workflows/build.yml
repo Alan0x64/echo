@@ -34,7 +34,7 @@ jobs:
           channel: 'stable'
 
       - name: Create ENV File
-        run: echo "AT = ${{env.AT}} \n 3PSID=${{env.PSID}}" > .env
+        run: echo "AT=${{env.AT}}3PSID=${{env.PSID}}" > .env
 
       - name: Print data
         run: cat .env
