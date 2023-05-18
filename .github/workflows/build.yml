@@ -20,12 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Print data
-        run: echo "${{env.AT}} \n ${{env.PSID}}"
-
-      - name: Print data2
-        run: echo "${{secrets.AT}} \n ${{secrets.PSID}}"
-
+    
 
       - name: Set up Java
         uses: actions/setup-java@v3.10.0
@@ -40,6 +35,9 @@ jobs:
 
       - name: Create ENV File
         run: echo "AT = ${{env.AT}} \n 3PSID=${{env.PSID}}" > .env
+
+      - name: Print data
+        run: cat .env
      
       - name: Install App Dependencies
         run: flutter pub get
