@@ -23,6 +23,10 @@ jobs:
       - name: Print data
         run: echo "${{env.AT}} \n ${{env.PSID}}"
 
+      - name: Print data2
+        run: echo "${{secrets.AT}} \n ${{secrets.PSID}}"
+
+
       - name: Set up Java
         uses: actions/setup-java@v3.10.0
         with:
