@@ -20,8 +20,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-    
-
       - name: Set up Java
         uses: actions/setup-java@v3.10.0
         with:
@@ -35,9 +33,6 @@ jobs:
 
       - name: Create ENV File
         run: echo -e "AT=${{env.AT}}\n3PSID=${{env.PSID}}" > .env
-
-      - name: Print data
-        run: cat .env
      
       - name: Install App Dependencies
         run: flutter pub get
