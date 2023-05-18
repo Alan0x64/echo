@@ -1,0 +1,104 @@
+name: Build APP APK
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+env:
+  AT: ${{ vars.DEVPRODUCTIONIP }}
+  3PSID: ${{ vars.AUTHPRODUCTIONIP }}
+
+jobs:
+
+  Build-APK:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3.10.0
+        with:
+          distribution: 'oracle'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2.10.0
+        with:
+          channel: 'stable'
+
+      - name: Create EventLink ENV File
+        run: echo "devproductionIP = 'http://18.168.59.10:3000' \n authproductionIP = 'http://18.168.59.10:8000/RT'" > user_app/.env
+      
+      - name: Create EventLink-Manger ENV File
+        run: echo "devproductionIP = 'http://18.168.59.10:3000' \n authproductionIP = 'http://18.168.59.10:8000/RT'" > org_app/.env
+
+      - name: Create EventLink Google-Services JSON
+        run: echo '${{ env.GOOGLE_SERVICES_FILE }}' > user_app/android/app/google-services.json
+
+      - name: Create EventLink-Manger Google-Services JSON
+        run: echo '${{ env.GOOGLE_SERVICES_FILE }}' > org_app/android/app/google-services.json
+
+      - name: Install EventLink Dependencies
+        run: flutter pub get
+        working-directory: user_app
+
+      - name: Install EventLink-Manger Dependencies
+        run: flutter pub get
+        working-directory: org_app
+
+      - name: Build EventLink
+        run: flutter build apk --release
+        working-directory: user_app
+      
+      - name: Build EventLink-Manger
+        run: flutter build apk --release
+        working-directory: org_app
+
+      - name: Retrieve EventLink APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: EventLink
+          path: user_app/build/app/outputs/flutter-apk/app-release.apk
+      
+      - name: Retrieve EventLink-Manger APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: EventLink-Manger
+          path: org_app/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        with:
+          tag_name: v1.0.0
+          release_name: Release v1.0.0  
+          draft: false
+          prerelease: false
+
+      - name: Upload EventLink APK
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: user_app/build/app/outputs/flutter-apk/app-release.apk
+          asset_name: EventLink.apk
+          asset_content_type: application/zip
+      
+
+      - name: Upload EventLink-Manger APK
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: org_app/build/app/outputs/flutter-apk/app-release.apk
+          asset_name: EventLink-Manger.apk
+          asset_content_type: application/zip
