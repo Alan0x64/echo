@@ -183,7 +183,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                     ),
                                     if (getCodeFromMarkdown(ChatScreen
                                             .messages[index]['t']
-                                            .toString()).isNotEmpty)
+                                            .toString())
+                                        .isNotEmpty)
                                       IconButton(
                                         onPressed: () async {
                                           try {
@@ -249,6 +250,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           }
                                           if (TTS.speaking) {
                                             await TTS.stopTTS();
+                                            TTS.speaking = false;
                                             return setState(() {});
                                           }
 
